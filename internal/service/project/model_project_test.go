@@ -11,65 +11,13 @@ import (
 	"go.mongodb.org/atlas-sdk/v20231115002/admin"
 )
 
-const (
-	limitName           = "limitName"
-	limitValue          = int64(64)
-	limitCurrentUsage   = int64(64)
-	limitDefaultLimit   = int64(32)
-	limitMaximumLimit   = int64(16)
-	projectID           = "projectId"
-	projectName         = "projectName"
-	projectOrgID        = "orgId"
-	projectClusterCount = int64(1)
-	clusterCount        = 1
-)
-
 var (
 	roles        = []string{"GROUP_DATA_ACCESS_READ_ONLY", "GROUP_CLUSTER_MANAGER"}
-	roleList, _  = types.ListValueFrom(context.Background(), types.StringType, roles)
 	teamRolesSDK = []admin.TeamRole{
 		{
 			TeamId:    conversion.StringPtr("teamId"),
 			RoleNames: roles,
 		},
-	}
-	teamsDSTF = []*project.TfTeamDSModel{
-		{
-			TeamID:    types.StringValue("teamId"),
-			RoleNames: roleList,
-		},
-	}
-	limitsSDK = []admin.DataFederationLimit{
-		{
-			Name:         limitName,
-			Value:        limitValue,
-			CurrentUsage: admin.PtrInt64(limitCurrentUsage),
-			DefaultLimit: admin.PtrInt64(limitDefaultLimit),
-			MaximumLimit: admin.PtrInt64(limitMaximumLimit),
-		},
-	}
-	limitsTF = []*project.TfLimitModel{
-		{
-			Name:         types.StringValue(limitName),
-			Value:        types.Int64Value(limitValue),
-			CurrentUsage: types.Int64Value(limitCurrentUsage),
-			DefaultLimit: types.Int64Value(limitDefaultLimit),
-			MaximumLimit: types.Int64Value(limitMaximumLimit),
-		},
-	}
-	projectSDK = admin.Group{
-		Id:           admin.PtrString(projectID),
-		Name:         projectName,
-		OrgId:        projectOrgID,
-		ClusterCount: int64(clusterCount),
-	}
-	projectSettingsSDK = admin.GroupSettings{
-		IsCollectDatabaseSpecificsStatisticsEnabled: admin.PtrBool(true),
-		IsDataExplorerEnabled:                       admin.PtrBool(true),
-		IsExtendedStorageSizesEnabled:               admin.PtrBool(true),
-		IsPerformanceAdvisorEnabled:                 admin.PtrBool(true),
-		IsRealtimePerformancePanelEnabled:           admin.PtrBool(true),
-		IsSchemaAdvisorEnabled:                      admin.PtrBool(true),
 	}
 )
 
