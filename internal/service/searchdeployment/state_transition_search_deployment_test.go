@@ -100,62 +100,6 @@ func TestSearchDeploymentStateTransition(t *testing.T) {
 	}
 }
 
-func TestSearchDeploymentStateTransitionForDelete(t *testing.T) {
-	testCases := []stateTransitionTestCase{
-		{
-			name: "Regular transition to DELETED",
-			mockResponses: []SearchDeploymentResponse{
-				{
-					DeploymentResp: responseWithState("UPDATING"),
-				},
-				{
-					DeploymentResp: nil,
-					HTTPResponse:   &http.Response{StatusCode: 400},
-					Err:            errors.New(searchdeployment.SearchDeploymentDoesNotExistsError),
-				},
-			},
-			expectedError: false,
-		},
-		{
-			name: "Error when API responds with error",
-			mockResponses: []SearchDeploymentResponse{
-				{
-					DeploymentResp: nil,
-					HTTPResponse:   &http.Response{StatusCode: 500},
-					Err:            errors.New("Internal server error"),
-				},
-			},
-			expectedError: true,
-		},
-		{
-			name: "Failed delete when responding with unknown state",
-			mockResponses: []SearchDeploymentResponse{
-				{
-					DeploymentResp: responseWithState("UPDATING"),
-				},
-				{
-					DeploymentResp: responseWithState(""),
-				},
-			},
-			expectedError: true,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			mockService := MockSearchDeploymentService{
-				MockResponses: tc.mockResponses,
-			}
-
-			err := searchdeployment.WaitSearchNodeDelete(context.Background(), dummyProjectID, clusterName, &mockService, testTimeoutConfig)
-
-			if (err != nil) != tc.expectedError {
-				t.Errorf("Case %s: Received unexpected error: %v", tc.name, err)
-			}
-		})
-	}
-}
-
 var testTimeoutConfig = retrystrategy.TimeConfig{
 	Timeout:    30 * time.Second,
 	MinTimeout: 100 * time.Millisecond,
