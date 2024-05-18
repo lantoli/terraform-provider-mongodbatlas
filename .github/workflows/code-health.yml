@@ -22,8 +22,8 @@ jobs:
       with:
         go-version-file: 'go.mod'
         cache: false
-    - name: Setup cache
-      uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
+    - id: cache-restore
+      uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
       with:
         path: |
           ~/.cache/go-build
@@ -33,6 +33,14 @@ jobs:
       run: make build
     - name: Unit Test
       run: make test
+    - id: cache-save
+      if: steps.cache-restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
+      uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: go-build-${{ hashFiles('**/go.sum') }}
   lint:
     runs-on: ubuntu-latest
     permissions: {}
@@ -53,12 +61,13 @@ jobs:
       - id: golangci-lint
         uses: golangci/golangci-lint-action@a4f60bb28d35aeee14e6880718e0c85ff1882e64
         with:
-          version: v1.57.2
+          version: v1.57.2 # Also update GOLANGCI_VERSION variable in GNUmakefile when updating this version
           skip-cache: true
       - id: actionlint
         run: make tools && actionlint -verbose -color
         shell: bash  
       - id: cache-save
+        if: steps.cache-restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
         uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
         with:
           key: go-lint-${{ hashFiles('**/go.sum', '**/GNUmakefile') }}
@@ -75,7 +84,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: website lint
-        run: make tools && make website-lint
+        run: make tools website-lint
   shellcheck:
     runs-on: ubuntu-latest
     permissions: {}
