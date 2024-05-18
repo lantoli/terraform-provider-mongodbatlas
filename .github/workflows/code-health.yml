@@ -63,8 +63,12 @@ jobs:
         with:
           version: v1.57.2 # Also update GOLANGCI_VERSION variable in GNUmakefile when updating this version
           skip-cache: true
+      - id: tools
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        run: make tools
+        shell: bash  
       - id: actionlint
-        run: make tools && actionlint -verbose -color
+        run: actionlint -verbose -color
         shell: bash  
       - id: cache-save
         if: steps.cache-restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/master'
