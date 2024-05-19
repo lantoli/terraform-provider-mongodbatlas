@@ -298,9 +298,6 @@ func (r *databaseUserRS) Update(ctx context.Context, req resource.UpdateRequest,
 
 	dbUserReq, d := NewMongoDBDatabaseUser(ctx, databaseUserState.Password, databaseUserPlan)
 	resp.Diagnostics.Append(d...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 
 	connV2 := r.Client.AtlasV2
 	dbUser, _, err := connV2.DatabaseUsersApi.UpdateDatabaseUser(ctx,
