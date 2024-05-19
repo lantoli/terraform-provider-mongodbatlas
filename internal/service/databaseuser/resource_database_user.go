@@ -227,9 +227,6 @@ func (r *databaseUserRS) Create(ctx context.Context, req resource.CreateRequest,
 
 	dbUserModel, diagnostic := NewTfDatabaseUserModel(ctx, databaseUserPlan, dbUser)
 	resp.Diagnostics.Append(diagnostic...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 
 	resp.Diagnostics.AddWarning("If the password value will be managed externally it is advised to remove the attribute", "More details can be found in resource documentation under the 'password' attribute")
 
