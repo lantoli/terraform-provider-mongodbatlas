@@ -325,9 +325,6 @@ func (r *databaseUserRS) Delete(ctx context.Context, req resource.DeleteRequest,
 	var databaseUserState *TfDatabaseUserModel
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &databaseUserState)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
 
 	connV2 := r.Client.AtlasV2
 	_, _, err := connV2.DatabaseUsersApi.DeleteDatabaseUser(
